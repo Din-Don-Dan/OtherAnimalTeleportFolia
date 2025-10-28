@@ -9,6 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.scheduler.BukkitRunnable;
 
 public class OATListeners implements Listener {
 
@@ -45,6 +46,13 @@ public class OATListeners implements Listener {
 					boolean toSendLeashedLeft = false;
 					boolean toSendTamedLeft = false;
 
+					// Create chunk tickets one time before entities are gathered and teleported
+					if (plugin.toUseTickets) {
+						plugin.log.logInfo("Adding chunk tickets.", Verbosity.HIGHEST);
+						event.getFrom().getChunk().addPluginChunkTicket(plugin);
+						event.getTo().getChunk().addPluginChunkTicket(plugin);
+					}
+
 					for(Entity ent : event.getFrom().getWorld().getNearbyEntities(event.getFrom(), radius, radius, radius)) {
 						String entID = "[Ent-" + ent.getEntityId() + "] ";
 
@@ -58,7 +66,7 @@ public class OATListeners implements Listener {
 									if(((LivingEntity) ent).getLeashHolder().equals(event.getPlayer())) {
 										try {
 											plugin.log.logInfo(entID + "Leash holder passed. Attempting to teleport entity.", Verbosity.HIGH);
-											OATMethods.teleportLeashedEnt(ent, event.getFrom(), event.getTo(), event.getPlayer(), plugin);
+											OATMethods.teleportLeashedEnt(ent, event.getTo(), event.getPlayer(), plugin);
 											continue;
 										} catch(Exception e) {
 											plugin.log.logInfo(entID + "Teleport reached exception. Sending player error.", Verbosity.HIGHEST);
@@ -81,7 +89,7 @@ public class OATListeners implements Listener {
 										if(!(ent instanceof Sittable) || !((Sittable) ent).isSitting()) {
 											try {
 												plugin.log.logInfo(entID + "Pet checks passed. Attempting to teleport entity.", Verbosity.HIGH);
-												OATMethods.teleportEnt(ent, event.getFrom(), event.getTo(), event.getPlayer(), plugin);
+												OATMethods.teleportEnt(ent, event.getTo(), event.getPlayer(), plugin);
 												continue;
 											} catch(Exception e) {
 												plugin.log.logInfo(entID + "Teleport reached exception. Sending player error.", Verbosity.HIGHEST);
@@ -98,6 +106,18 @@ public class OATListeners implements Listener {
 							toSendLeft  = true;
 						}
 					}
+
+					// Remove chunk tickets 60 ticks after just to ensure entities have been fully processed
+					new BukkitRunnable() {
+						@Override
+						public void run() {
+							plugin.log.logInfo("Removing chunk tickets.", Verbosity.HIGHEST);
+							if (plugin.toUseTickets) {
+								event.getFrom().getChunk().removePluginChunkTicket(plugin);
+								event.getTo().getChunk().removePluginChunkTicket(plugin);
+							}
+						}
+					}.runTaskLater(plugin, 30L);
 
 					if(plugin.config.failedTeleportMessage != null && !plugin.config.failedTeleportMessage.isEmpty() && toSendError) {
 						plugin.common.sendMessage(plugin.config.usePrefix, plugin.config.failedTeleportMessage, event);
