@@ -40,7 +40,6 @@ public class OATConfig {
 	public String 					prefix;
 	public String 					failedTeleportMessage;
 	public String 					leftEntityMessage;
-	public String 					leftLeashedEntityMessage;
 	public String 					leftTamedEntityMessage;
 
 	public OATConfig(OtherAnimalTeleport plugin) {
@@ -142,7 +141,6 @@ public class OATConfig {
 		//messages
 		failedTeleportMessage = globalConfig.getString("fail_teleport", "&7An entity could not be teleported and is located near (&c%x&7, &c%y&7, &c%z&7).");
 		leftEntityMessage = globalConfig.getString("entity_left", "&7An entity was left behind near (&c%x&7, &c%y&7, &c%z&7).");
-		leftLeashedEntityMessage = globalConfig.getString("leashed_entity_left", "&7A leashed entity was left behind near (&c%x&7, &c%y&7, &c%z&7).");
 		leftTamedEntityMessage = globalConfig.getString("tamed_entity_left", "&7A tamed pet was left behind near (&c%x&7, &c%y&7, &c%z&7).");
 
 		if(plugin.getServer().getPluginManager().isPluginEnabled("WorldGuard")) {
