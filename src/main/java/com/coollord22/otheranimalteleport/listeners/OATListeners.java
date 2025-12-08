@@ -21,9 +21,9 @@ public class OATListeners implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void onJoinUpdateChecker(PlayerJoinEvent event) {
-		Player p = event.getPlayer();
-		if(p.hasPermission("otheranimalteleport.admin.updates") && plugin.config.globalUpdateChecking) {
-			plugin.getServer().getScheduler().runTaskLater(plugin, () -> plugin.updateChecker.checkForUpdate(p), 15L);
+		Player player = event.getPlayer();
+		if(player.hasPermission("otheranimalteleport.admin.updates") && plugin.config.globalUpdateChecking) {
+			plugin.getServer().getScheduler().runTaskLater(plugin, () -> plugin.updateChecker.checkForUpdate(player), 15L);
 		}
 	}
 
