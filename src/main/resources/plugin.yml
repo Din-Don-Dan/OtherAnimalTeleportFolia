@@ -2,6 +2,7 @@ name: OtherAnimalTeleport
 main: com.coollord22.otheranimalteleport.OtherAnimalTeleport
 version: ${project.version}-b${buildNumber}
 author: CoolLord22
+folia-supported: true
 load: POSTWORLD
 api-version: 1.13
 softdepend: [WorldGuard]
