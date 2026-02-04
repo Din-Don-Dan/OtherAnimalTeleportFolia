@@ -41,6 +41,7 @@ public class OATConfig {
 	public String 					failedTeleportMessage;
 	public String 					leftEntityMessage;
 	public String 					leftTamedEntityMessage;
+	public String 					leftLeashedEntityMessage;
 	public String 					notInWorldGroupMessage;
 	public String 					blockedRegionLeftMessage;
 
@@ -144,6 +145,7 @@ public class OATConfig {
 		failedTeleportMessage = globalConfig.getString("fail_teleport", "&7An entity could not be teleported and is located near (&c%x&7, &c%y&7, &c%z&7).");
 		leftEntityMessage = globalConfig.getString("entity_left", "&7An entity was left behind near (&c%x&7, &c%y&7, &c%z&7).");
 		leftTamedEntityMessage = globalConfig.getString("tamed_entity_left", "&7A tamed pet was left behind near (&c%x&7, &c%y&7, &c%z&7).");
+		leftLeashedEntityMessage = globalConfig.getString("leashed_entity_left", "&7A leashed pet was left behind near (&c%x&7, &c%y&7, &c%z&7).");
 		notInWorldGroupMessage = globalConfig.getString("not_in_world_group", "&7An entity was left behind near (&c%x&7, &c%y&7, &c%z&7) because your destination was not in the same world group.");
 		blockedRegionLeftMessage = globalConfig.getString("blocked_region", "&7An entity was left behind near (&c%x&7, &c%y&7, &c%z&7) because your destination did not permit animal teleportation.");
 
