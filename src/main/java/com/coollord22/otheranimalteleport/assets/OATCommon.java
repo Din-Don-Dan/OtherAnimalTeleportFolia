@@ -54,30 +54,6 @@ public class OATCommon {
         World fromWorld = event.getFrom().getWorld();
         World toWorld = event.getTo().getWorld();
 
-        // WorldGuard blocked region check
-        if(plugin.getServer().getPluginManager().isPluginEnabled("WorldGuard")) {
-            if(plugin.config.blockedRegions.containsKey(toWorld)) {
-                for(ProtectedRegion region : plugin.config.blockedRegions.get(toWorld)) {
-                    if(region.contains(BlockVector3.at(event.getTo().getX(), event.getTo().getY(), event.getTo().getZ()))) {
-                        plugin.log.logInfo("Player teleporting into a blocked region; ignoring entity checks.", Verbosity.HIGH);
-                        return false;
-                    }
-                }
-            }
-        }
-
-        // GriefDefender Admin claim check
-        if(plugin.getServer().getPluginManager().isPluginEnabled("GriefDefender")) {
-            if(plugin.config.preventAdminClaims) {
-                final Claim claim = GriefDefender.getCore().getClaimAt(event.getTo());
-                if (claim != null && claim.isAdminClaim()) {
-                    plugin.log.logInfo("Player teleporting into an admin claim; ignoring entity checks.", Verbosity.HIGH);
-                    return false;
-                }
-            }
-        }
-
-        // World Group checks
         if(fromWorld.equals(toWorld)) {
             return true;
         } else {
@@ -89,5 +65,31 @@ public class OATCommon {
         }
         plugin.log.logInfo("From and To worlds were not found in same group, ending checks.", Verbosity.HIGH);
         return false;
+    }
+
+    public boolean allowedRegion(Location location) {
+        // WorldGuard blocked region check
+        if(plugin.getServer().getPluginManager().isPluginEnabled("WorldGuard")) {
+            if(plugin.config.blockedRegions.containsKey(location.getWorld())) {
+                for(ProtectedRegion region : plugin.config.blockedRegions.get(location.getWorld())) {
+                    if(region.contains(BlockVector3.at(location.getX(), location.getY(), location.getZ()))) {
+                        plugin.log.logInfo("Player teleporting to/from a blocked region; ignoring entity checks.", Verbosity.HIGH);
+                        return false;
+                    }
+                }
+            }
+        }
+
+        // GriefDefender Admin claim check
+        if(plugin.getServer().getPluginManager().isPluginEnabled("GriefDefender")) {
+            if(plugin.config.preventAdminClaims) {
+                final Claim claim = GriefDefender.getCore().getClaimAt(location);
+                if (claim != null && claim.isAdminClaim()) {
+                    plugin.log.logInfo("Player teleporting to/from an admin claim; ignoring entity checks.", Verbosity.HIGH);
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 }
