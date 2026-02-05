@@ -1,7 +1,6 @@
 package com.coollord22.otheranimalteleport;
 
 import com.coollord22.otheranimalteleport.assets.Verbosity;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -13,32 +12,50 @@ public class OATMethods {
 
 		plugin.log.logInfo(entID + "Received leashed-entity teleport. Attempting to null current leash holder.", Verbosity.HIGHEST);
 		entity.setLeashHolder(null);
-
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+		plugin.foliaLib.getScheduler().runAtEntityLater(entity, () -> {
 			handleInvulnerability(entity, plugin);
-
 			plugin.log.logInfo(entID + "Teleporting entity " + entity.getType(), Verbosity.HIGH);
-			if(!entity.teleport(to)) {
-				throw new RuntimeException("Unsuccessful entity teleport");
-			}
 
-			Bukkit.getScheduler().runTaskLater(plugin, () -> {
-				// Delay re-attaching of leash by 10 ticks to ensure entity pathfinding cant freeze
-				plugin.log.logInfo(entID + "Re-attaching leash holder as " + p.getName() + ".", Verbosity.HIGHEST);
-				entity.setLeashHolder(p);
-			}, 10L);
+			if(plugin.foliaLib.isFolia()) {
+				entity.teleportAsync(to).thenAccept((success) -> {
+					if(!success) throw new RuntimeException("Unsuccessful entity teleport");
+					else {
+						plugin.foliaLib.getScheduler().runAtEntityLater(entity, () -> {
+							// Delay re-attaching of leash by 10 ticks to ensure entity pathfinding cant freeze
+							plugin.log.logInfo(entID + "Re-attaching leash holder as " + p.getName() + ".", Verbosity.HIGHEST);
+							entity.setLeashHolder(p);
+						}, 10L);
+					}
+				});
+			} else {
+				if(!entity.teleport(to)) {
+					throw new RuntimeException("Unsuccessful entity teleport");
+				}
+
+				plugin.foliaLib.getScheduler().runAtEntityLater(entity, () -> {
+					// Delay re-attaching of leash by 10 ticks to ensure entity pathfinding cant freeze
+					plugin.log.logInfo(entID + "Re-attaching leash holder as " + p.getName() + ".", Verbosity.HIGHEST);
+					entity.setLeashHolder(p);
+				}, 10L);
+			}
 		}, 5L);
 	}
 
 	public static void teleportTamedEnt(Entity entity, Location to, OtherAnimalTeleport plugin) {
 		String entID = "[Ent-" + entity.getEntityId() + "] ";
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
+		plugin.foliaLib.getScheduler().runAtEntityLater(entity, () -> {
 			handleInvulnerability(entity, plugin);
 
 			plugin.log.logInfo(entID + "Teleporting entity " + entity.getType(), Verbosity.HIGH);
-			if(!entity.teleport(to)) {
-				throw new RuntimeException("Unsuccessful entity teleport");
+			if(plugin.foliaLib.isFolia()) {
+				entity.teleportAsync(to).thenAccept((success) -> {
+					if(!success) throw new RuntimeException("Unsuccessful entity teleport");
+				});
+			} else {
+				if(!entity.teleport(to)) {
+					throw new RuntimeException("Unsuccessful entity teleport");
+				}
 			}
 		}, 5L);
 	}
@@ -50,7 +67,7 @@ public class OATMethods {
 		plugin.log.logInfo(entID + "Protecting entity with invulnerability and resistance.", Verbosity.HIGHEST);
 		entity.setInvulnerable(true);
 
-		Bukkit.getScheduler().runTaskLater(plugin, () -> {
+		plugin.foliaLib.getScheduler().runAtEntityLater(entity, () -> {
 			plugin.log.logInfo(entID + "Reverting invulnerability status.", Verbosity.HIGHEST);
 			entity.setInvulnerable(wasInvulnerable);
 		}, 30L);

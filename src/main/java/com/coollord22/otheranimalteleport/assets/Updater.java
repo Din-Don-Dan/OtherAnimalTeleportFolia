@@ -1,7 +1,6 @@
 package com.coollord22.otheranimalteleport.assets;
 
 import com.coollord22.otheranimalteleport.OtherAnimalTeleport;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -29,7 +28,7 @@ public class Updater {
 
 	public void checkForUpdate(Player p) {
 		List<String> UPDATE_MSG = new ArrayList<>();
-		Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+		plugin.foliaLib.getScheduler().runAsync((task) -> {
 			//Request current spigot version
 			try {
 				final HttpsURLConnection connection = (HttpsURLConnection) new URL("https://api.spigotmc.org/legacy/update.php?resource=" + ID).openConnection();

@@ -3,8 +3,7 @@ package com.coollord22.otheranimalteleport.listeners;
 import com.coollord22.otheranimalteleport.OATMethods;
 import com.coollord22.otheranimalteleport.OtherAnimalTeleport;
 import com.coollord22.otheranimalteleport.assets.Verbosity;
-import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -24,7 +23,7 @@ public class OATListeners implements Listener {
 	public void onJoinUpdateChecker(PlayerJoinEvent event) {
 		Player player = event.getPlayer();
 		if(player.hasPermission("otheranimalteleport.admin.updates") && plugin.config.globalUpdateChecking) {
-			plugin.getServer().getScheduler().runTaskLater(plugin, () -> plugin.updateChecker.checkForUpdate(player), 15L);
+			plugin.foliaLib.getScheduler().runLater(() -> plugin.updateChecker.checkForUpdate(player), 15L);
 		}
 	}
 
@@ -54,7 +53,7 @@ public class OATListeners implements Listener {
 			final boolean leashPerm = player.hasPermission("otheranimalteleport.player.teleportleashed");
 			final boolean tamePerm = player.hasPermission("otheranimalteleport.player.teleportpets");
 
-			handleChunkTickets(event.getFrom().getChunk(), event.getTo().getChunk(), false); // remove chunk tickets
+			handleChunkTickets(event.getFrom(), event.getTo(), false); // remove chunk tickets
 			// For all nearby entities, check and process accordingly
 			for(Entity ent : event.getFrom().getWorld().getNearbyEntities(event.getFrom(), plugin.config.radius, plugin.config.radius, plugin.config.radius)) {
 				String entID = "[%s-%d] ".formatted(ent.getType().toString(), ent.getEntityId());
@@ -103,7 +102,7 @@ public class OATListeners implements Listener {
                     }
 				}
 			}
-			handleChunkTickets(event.getFrom().getChunk(), event.getTo().getChunk(), true); // remove chunk tickets
+			handleChunkTickets(event.getFrom(), event.getTo(), true); // remove chunk tickets
 		}
 		// player notification handling
 		if(plugin.config.failedTeleportMessage != null && !plugin.config.failedTeleportMessage.isEmpty() && toSendError) {
@@ -121,22 +120,23 @@ public class OATListeners implements Listener {
 		}
 	}
 
-	private void handleChunkTickets(Chunk from, Chunk to, boolean remove) {
+	private void handleChunkTickets(Location from, Location to, boolean remove) {
 		if (plugin.toUseTickets) {
 			if(remove) {
 				// Remove chunk tickets 30 ticks after just to ensure entities have been fully processed
-				Bukkit.getScheduler().runTaskLater(plugin, () -> {
-					plugin.log.logInfo("Removing chunk tickets.", Verbosity.HIGHEST);
-					if (plugin.toUseTickets) {
-						from.removePluginChunkTicket(plugin);
-						to.removePluginChunkTicket(plugin);
-					}
+				plugin.foliaLib.getScheduler().runAtLocationLater(from, () -> {
+					plugin.log.logInfo("Removing from-chunk ticket.", Verbosity.HIGHEST);
+					from.getChunk().addPluginChunkTicket(plugin);
+				}, 30L);
+				plugin.foliaLib.getScheduler().runAtLocationLater(to, () -> {
+					plugin.log.logInfo("Removing to-chunk ticket.", Verbosity.HIGHEST);
+					to.getChunk().removePluginChunkTicket(plugin);
 				}, 30L);
 			} else {
 				// Create chunk tickets one time before entities are gathered and teleported
 				plugin.log.logInfo("Adding chunk tickets.", Verbosity.HIGHEST);
-				from.addPluginChunkTicket(plugin);
-				to.addPluginChunkTicket(plugin);
+				from.getChunk().addPluginChunkTicket(plugin);
+				to.getChunk().addPluginChunkTicket(plugin);
 			}
 		}
 	}

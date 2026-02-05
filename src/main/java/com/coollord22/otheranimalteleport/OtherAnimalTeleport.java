@@ -2,6 +2,7 @@ package com.coollord22.otheranimalteleport;
 
 import com.coollord22.otheranimalteleport.assets.*;
 import com.coollord22.otheranimalteleport.listeners.OATListeners;
+import com.tcoded.folialib.FoliaLib;
 import net.md_5.bungee.api.ChatColor;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.AdvancedPie;
@@ -27,6 +28,7 @@ public class OtherAnimalTeleport extends JavaPlugin {
 
 	public boolean enabled;
 	public boolean toUseTickets = false;
+	public FoliaLib foliaLib;
 
 	public OtherAnimalTeleport() {
 		plugin = this;
@@ -36,7 +38,8 @@ public class OtherAnimalTeleport extends JavaPlugin {
 	public void onEnable() { 
 		plugin = this;
 		initCommon();
-		Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+		foliaLib = new FoliaLib(this);
+		foliaLib.getScheduler().runNextTick((task) -> {
 			initConfig();
 			registerCommands();
 			registerListeners();
@@ -53,10 +56,9 @@ public class OtherAnimalTeleport extends JavaPlugin {
 					toUseTickets = true;
 					plugin.log.logInfo(ChatColor.RED + "Found server version " + serverVersion[0] + "." + serverVersion[1] + " >= 1.14, using chunk tickets!", Verbosity.HIGH);
 				}
-		}, 1L);
+		});
 		writeNames(EntityType.class);
 	}
-
 
 	private void initCommon() {
 		// Set plugin name & version, this must be at the start of onEnable

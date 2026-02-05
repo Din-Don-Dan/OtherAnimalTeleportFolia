@@ -13,10 +13,16 @@
 	</properties>
 
 	<repositories>
-		<!-- Spigot repo -->
+		<!-- PaperMC repo -->
 		<repository>
-			<id>spigot-repo</id>
-			<url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+			<id>papermc</id>
+			<url>https://repo.papermc.io/repository/maven-public/</url>
+		</repository>
+
+		<!-- FoliaLib repo -->
+		<repository>
+			<id>tcoded-releases</id>
+			<url>https://repo.tcoded.com/releases</url>
 		</repository>
 
 		<!-- BStats repo -->
@@ -40,10 +46,16 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.spigotmc</groupId>
-			<artifactId>spigot-api</artifactId>
-			<version>1.21.10-R0.1-SNAPSHOT</version>
+			<groupId>io.papermc.paper</groupId>
+			<artifactId>paper-api</artifactId>
+			<version>1.21.11-R0.1-SNAPSHOT</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.tcoded</groupId>
+			<artifactId>FoliaLib</artifactId>
+			<version>0.5.1</version>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.bstats</groupId>
@@ -85,6 +97,11 @@
 							<!-- Replace this with your package! -->
 							<shadedPattern>com.coollord22.otheranimalteleport</shadedPattern>
 						</relocation>
+						<relocation>
+							<pattern>com.tcoded.folialib</pattern>
+							<!-- !! MAKE SURE TO CHANGE THIS TO YOUR PLUGIN'S GROUP & PLUGIN NAME !! -->
+							<shadedPattern>com.coollord22.otheranimalteleport.lib.folialib</shadedPattern>
+						</relocation>
 					</relocations>
 				</configuration>
 				<executions>
@@ -120,11 +137,12 @@
 				</configuration>
 			</plugin>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.1</version>
+				<version>3.13.0</version>
 				<configuration>
-					<source>16</source>
-					<target>16</target>
+					<source>21</source>
+					<target>21</target>
 				</configuration>
 			</plugin>
 		</plugins>
